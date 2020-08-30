@@ -12,32 +12,30 @@ log = get_logger()
 log = log.bind(user=USER)
 metadata = sa.MetaData()
 
-messages_table = sa.Table('messages', metadata, sa.Column('id', sa.Integer, primary_key=True), sa.Column('message', sa.String(255)))
-
-engine = None
+messages_table = sa.Table('messages', metadata, sa.Column('id', sa.Integer, primary_key=True),
+                          sa.Column('message', sa.String(255)))
 
 
 class MessagesModel:
-    @staticmethod
-    async def get_engine():
-        global engine
-        if engine is None:
-            engine = await create_engine(user=USER, db=DB_NAME, port=PORT, host=HOST, password=PASS)
+    def __init__(self):
+        self.__engine = None
 
-        return engine
+    async def get_engine(self):
+        if self.__engine is None:
+            self.__engine = await create_engine(user=USER, db=DB_NAME, port=PORT, host=HOST, password=PASS)
 
-    @classmethod
-    async def add(cls, message):
-        engine_instance = await MessagesModel.get_engine()
+        return self.__engine
+
+    async def add(self, message):
+        engine_instance = await self.get_engine()
         async with engine_instance.acquire() as conn:
             await conn.execute(messages_table.insert().values(message=message))
             await conn.execute('commit')
 
             log.info("message was added to db", message=message)
 
-    @classmethod
-    async def go(cls):
-        engine_instance = await MessagesModel.get_engine()
+    async def get(self):
+        engine_instance = await self.get_engine()
         dicts = {}
         async with engine_instance.acquire() as conn:
             res = await conn.execute(messages_table.select())
