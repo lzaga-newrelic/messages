@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pytest = "*"
+tornado = "*"
+asyncio = "*"
+sqlalchemy = "*"
+aiomysql = "*"
+uvloop = "*"
+structlog = "*"
+callee = "*"
+pytest-asyncio = "*"
+pytest-tornado = "*"
+pytest-mock = "*"
+asynctest = "*"
+requests-async = "*"
+
+[requires]
+python_version = "3.8"
