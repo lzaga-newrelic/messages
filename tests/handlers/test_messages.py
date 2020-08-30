@@ -7,7 +7,7 @@ import messages.main as MainHandler
 
 
 @pytest.fixture
-def app(messages_model):
+def app():
     return web.Application([
         (r"/", MainHandler),
         (r"/messages", MessagesHandler)]
