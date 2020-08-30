@@ -1,25 +1,13 @@
 import pytest
 import json
 from tornado import web
-from unittest.mock import AsyncMock
-from asynctest import CoroutineMock
 
-from messages.model import MessagesModel
 import messages.handlers.messages as MessagesHandler
 import messages.main as MainHandler
 
 
 @pytest.fixture
-def messages_model():
-    MessagesModel.add = CoroutineMock()
-
-    return MessagesModel
-
-
-@pytest.fixture
 def app(messages_model):
-    MessagesHandler.MessagesModel = messages_model
-
     return web.Application([
         (r"/", MainHandler),
         (r"/messages", MessagesHandler)]
@@ -56,4 +44,3 @@ async def test_get_messages(http_client, event_loop):
     resp = await http_client.fetch(url, method='POST', headers=None, body=body)
 
     assert resp.code == 200
-    assert MessagesHandler.MessagesModel.add.called is True
