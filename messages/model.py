@@ -17,18 +17,18 @@ messages_table = sa.Table('messages', metadata, sa.Column('id', sa.Integer, prim
 engine = None
 
 
-async def get_engine():
-    global engine
-    if engine is None:
-        engine = await create_engine(user=USER, db=DB_NAME, port=PORT, host=HOST, password=PASS)
-
-    return engine
-
-
 class MessagesModel:
+    @staticmethod
+    async def get_engine():
+        global engine
+        if engine is None:
+            engine = await create_engine(user=USER, db=DB_NAME, port=PORT, host=HOST, password=PASS)
+
+        return engine
+
     @classmethod
     async def add(cls, message):
-        engine_instance = await get_engine()
+        engine_instance = await MessagesModel.get_engine()
         async with engine_instance.acquire() as conn:
             await conn.execute(messages_table.insert().values(message=message))
             await conn.execute('commit')
@@ -37,7 +37,7 @@ class MessagesModel:
 
     @classmethod
     async def go(cls):
-        engine_instance = await get_engine()
+        engine_instance = await MessagesModel.get_engine()
         dicts = {}
         async with engine_instance.acquire() as conn:
             res = await conn.execute(messages_table.select())
