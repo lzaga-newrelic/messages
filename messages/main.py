@@ -1,33 +1,19 @@
-from tornado.ioloop import IOLoop
-from tornado.web import Application, RequestHandler
-import asyncio
-import uvloop
-from structlog import get_logger
-
-from messages.handlers.messages import MessagesHandler
-
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-log = get_logger()
-
-
-class MainHandler(RequestHandler):
-    def get(self):
-        self.write("Hello, world")
-
-
-def make_app():
-    return Application([
-        (r"/", MainHandler),
-        (r"/messages", MessagesHandler)
-    ])
-
-
-def main():
-    app = make_app()
-    app.listen(3000)
-    log.info("Server is running.....")
-    IOLoop.instance().start()
+emulator_host = 'localhost:8085'
 
 
 if __name__ == "__main__":
-    main()
+    from messages.server import MessagesServer
+
+    service_factory = MessagesServer()
+
+    (
+        service_factory.bind_ioloop()
+            .define_logger(development=True)
+            .register_curl_client()
+            .bind_dependencies()
+            .add_pubsub_handlers()
+            .create_pubsub_app(emulator_host=emulator_host)
+            .add_routes()
+            .create_app()
+            .start_server()
+    )

@@ -19,6 +19,8 @@ pytest-tornado = "*"
 pytest-mock = "*"
 asynctest = "*"
 requests-async = "*"
+signipy = {editable = true, git = "ssh://git@github.com/SignifAi/SigniPy.git"}
+pycurl = "*"
 
 [requires]
 python_version = "3.8"
